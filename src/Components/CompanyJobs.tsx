@@ -63,7 +63,15 @@ function CompanyJobs({
     // Check if the jobKey exists in the seen_jobs object in localStorage
     const seenJobsStr = localStorage.getItem("seen_jobs");
     let seenJobs: { [key: string]: string } = {};
-    if (seenJobsStr) {
+    const threshold = 15; // in minutes, as per prompt
+    if (!seenJobsStr) {
+      // If seen_jobs does not exist, treat jobs as new if they are 15 minutes old or less
+      const detectedTime = new Date(job.detected);
+      const now = new Date();
+      const diffMs = now.getTime() - detectedTime.getTime();
+      const diffMinutes = diffMs / 60000;
+      return diffMinutes <= threshold;
+    } else {
       try {
         seenJobs = JSON.parse(seenJobsStr);
       } catch (e) {
@@ -74,7 +82,6 @@ function CompanyJobs({
       return true;
     }
     // If the job was seen, check if it was seen less than 15 minutes ago
-    const threshold = 60; //in minutes
     const seenTime = new Date(seenJobs[jobKey]);
     const now = new Date();
     const diffMs = now.getTime() - seenTime.getTime();
