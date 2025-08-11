@@ -2,7 +2,7 @@
 
 A real-time job aggregator that automatically scrapes and displays the latest job postings from 15 major companies every 15 minutes.
 
-## �� Features
+## 🔥 Features
 
 - **Real-time Updates**: Automatically refreshes job listings every 15 minutes
 - **Multi-Company Support**: Aggregates jobs from 15 different companies
