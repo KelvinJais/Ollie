@@ -1,69 +1,98 @@
-# React + TypeScript + Vite
+# Ollie - Job Aggregator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A real-time job aggregator that automatically scrapes and displays the latest job postings from 15 major companies every 15 minutes.
 
-Currently, two official plugins are available:
+## �� Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Real-time Updates**: Automatically refreshes job listings every 15 minutes
+- **Multi-Company Support**: Aggregates jobs from 15 different companies
+- **Smart Filtering**: Toggle between viewing all jobs or only new ones
+- **Job Tracking**: Remembers which jobs you've seen to highlight truly new postings
+- **Responsive Design**: Clean, modern interface that works on all devices
+- **Direct Links**: Click any job title to go directly to the company's job posting
 
-## Expanding the ESLint configuration
+## 🏢 Supported Companies
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Ollie monitors job postings from 15 major companies, providing you with a comprehensive view of available opportunities across different industries.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Adobe
+- Amazon
+- Datadog
+- Discord
+- Meta
+- Microsoft
+- Netflix
+- Nutanix
+- Nvidia
+- Oracle
+- Palantir
+- Paypal
+- Walmart
+- Apple
+- Figma
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🛠️ Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **UI Components**: Custom component library with shadcn/ui inspiration
+- **State Management**: React hooks and localStorage for persistence
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (version 16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd Ollie
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Install dependencies:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+3. Start the development server:
+
+```bash
+npm run dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📞 Support
+
+If you have any questions or need help with Ollie, please:
+
+- Open an issue on GitHub
+- Check the existing documentation
+- Review the code comments for implementation details
+
+**Ollie** - Never miss the perfect job opportunity again! 🎯
