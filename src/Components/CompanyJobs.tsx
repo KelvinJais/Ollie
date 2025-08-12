@@ -94,11 +94,14 @@ function CompanyJobs({
   // Mark all jobs that aren't seen as seen when component mounts or jobListings change
 
   useEffect(() => {
-    jobListings.forEach((job) => {
-      if (isJobNew(job, false)) {
-        markJobAsSeen(job);
-      }
-    });
+    const timeoutId = setTimeout(() => {
+      jobListings.forEach((job) => {
+        if (isJobNew(job, false)) {
+          markJobAsSeen(job);
+        }
+      });
+    }, 500);
+    return () => clearTimeout(timeoutId);
     // eslint-disable-next-line
   }, [jobListings]);
 
@@ -120,8 +123,8 @@ function CompanyJobs({
   }
 
   return (
-    <div className="flex  gap-4 bg-gray-100 rounded-2xl py-3 px-4 mb-4">
-      <div className="min-w-[150px]">
+    <div className="  md:flex gap-4 bg-gray-100 rounded-2xl py-3 px-4 m-3">
+      <div className="min-w-[150px] mb-6">
         <h2 className="text-2xl ">{companyName}</h2>
         <p className="text-sm text-gray-500 ">
           Total Jobs: {filteredJobs.length}
@@ -130,7 +133,7 @@ function CompanyJobs({
       <ul className="w-full">
         {filteredJobs.map((job) => (
           <li key={job.jobId}>
-            <div className="flex justify-between my-2 hover:bg-gray-200 p-2 rounded-lg">
+            <div className="flex justify-between my-2 hover:bg-gray-200  rounded-lg">
               <div className="flex flex-col">
                 <a href={job.url} target="_blank" rel="noopener noreferrer">
                   {job.title}
@@ -140,7 +143,9 @@ function CompanyJobs({
                 </p>
               </div>
               {isJobNew(job, true) && (
-                <Badge className="bg-amber-200 text-gray-800 ">New</Badge>
+                <Badge className="bg-amber-200 text-gray-800 h-[40px]">
+                  New
+                </Badge>
               )}
             </div>
           </li>

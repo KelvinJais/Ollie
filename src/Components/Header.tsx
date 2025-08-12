@@ -1,7 +1,7 @@
 function Header() {
   return (
     <div className="flex">
-      <h1 className="text-3xl">Ollie</h1>
+      <h1 className="text-6xl mb-4">Ollie</h1>
     </div>
   );
 }
