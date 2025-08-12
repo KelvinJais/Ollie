@@ -123,7 +123,7 @@ function CompanyJobs({
   }
 
   return (
-    <div className="  md:flex gap-4 bg-gray-100 rounded-2xl py-3 px-4 m-3">
+    <div className="md:flex bg-gray-100 rounded-2xl py-3 px-4 mb-4">
       <div className="min-w-[150px] mb-6">
         <h2 className="text-2xl ">{companyName}</h2>
         <p className="text-sm text-gray-500 ">
