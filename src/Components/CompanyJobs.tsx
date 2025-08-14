@@ -196,17 +196,7 @@ function CompanyJobs({
 
   function isJobClicked(job: Job): boolean {
     const jobKey = job.jobId ? job.jobId : job.url;
-    const clickedJobsStr = localStorage.getItem("hasClicked");
-    if (!clickedJobsStr) {
-      return false;
-    }
-    try {
-      const clickedJobs: { [key: string]: boolean } =
-        JSON.parse(clickedJobsStr);
-      return clickedJobs[jobKey] === true;
-    } catch (e) {
-      return false;
-    }
+    return clickedJobIds.includes(jobKey);
   }
 
   return (
