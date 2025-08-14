@@ -137,6 +137,7 @@ function CompanyJobs({
       }
     }
     if (!(jobKey in seenJobs)) {
+      markJobAsSeen(job);
       return "Brand new";
     }
     // If the job was seen, check if it was seen less than 15 minutes ago
