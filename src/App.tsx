@@ -47,6 +47,26 @@ function App() {
     setshowOnlyNew(!showOnlyNew);
   }
 
+  const threshold = 15;
+  const firstTime = localStorage.getItem("firstTime");
+  let firstVisit = false;
+  if (!firstTime) {
+    firstVisit = true;
+    localStorage.setItem("firstTime", new Date().toISOString());
+  } else {
+    const firstTimeDate = new Date(firstTime);
+    const now = new Date();
+    const diffMs = now.getTime() - firstTimeDate.getTime();
+    const diffMinutes = diffMs / (60 * 1000);
+    if (diffMinutes < threshold) {
+      firstVisit = true;
+    }
+  }
+  // Instantiate a new key in localStorage 'seen_jobs' if it doesn't exist
+  if (!localStorage.getItem("seen_jobs")) {
+    localStorage.setItem("seen_jobs", JSON.stringify({}));
+  }
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
   if (!data || !data.jobs) return <div>No data available</div>;
@@ -56,6 +76,8 @@ function App() {
       <Filter showOnlyNew={showOnlyNew} toggle={toggleShowNew}></Filter>
       {Object.entries(data.jobs).map(([company, jobs]) => (
         <CompanyJobs
+          firstVisit={firstVisit}
+          threshold={threshold}
           key={company}
           company={company}
           showOnlyNew={showOnlyNew}

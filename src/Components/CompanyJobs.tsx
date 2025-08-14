@@ -1,5 +1,5 @@
 import { Badge } from "@/Components/ui/badge";
-import { useEffect } from "react";
+import { useState } from "react";
 type Job = {
   jobId?: string; // some jobs have jobId, some only url as ID
   title: string;
@@ -36,79 +36,68 @@ function timeDiffFromNow(isoDateStr: string): string {
 
 function CompanyJobs({
   company,
+  threshold,
+  firstVisit,
   jobListings,
   showOnlyNew,
 }: {
   company: string;
+  threshold: number;
+  firstVisit: boolean;
   jobListings: Job[];
   showOnlyNew: boolean;
 }) {
+  const [clickedJobIds, setClickedJobIds] = useState<string[]>(() => {
+    const hasClicked = localStorage.getItem("hasClicked");
+    if (!hasClicked) return [];
+    try {
+      const parsed = JSON.parse(hasClicked);
+      // parsed is an object like { jobid1: true, jobid2: true }
+      return Object.keys(parsed).filter((jobId) => parsed[jobId]);
+    } catch {
+      return [];
+    }
+  });
+
+  console.log("firstVisit", firstVisit);
+
+  if (firstVisit) {
+    jobListings.forEach((job) => {
+      const jobKey = job.jobId ? job.jobId : job.url;
+      const seenJobsStr = localStorage.getItem("seen_jobs");
+      let seenJobs: { [key: string]: string } = {};
+      if (seenJobsStr) {
+        try {
+          seenJobs = JSON.parse(seenJobsStr);
+        } catch (e) {
+          seenJobs = {};
+        }
+      }
+      if (!seenJobs[jobKey]) {
+        markJobAsSeen(job);
+      }
+    });
+  }
+
   const companyName = capitalizeFirstLetter(company);
   if (!jobListings || jobListings.length === 0) {
     return <></>;
   }
-
   // Filter jobs based on showOnlyNew state
   const filteredJobs = showOnlyNew
-    ? jobListings.filter((job) => isJobNew(job, true))
+    ? jobListings.filter((job) => {
+        const status = isJobNew(job);
+        return status === "Brand new" || status === "New";
+      })
     : jobListings;
+
   if (!filteredJobs || filteredJobs.length === 0) {
     return <></>;
   }
-  function isJobNew(job: Job, checkTimeDiff: boolean): boolean {
-    if (!job) return false;
-    // Use jobId if available, otherwise fallback to url as unique key
-    const jobKey = job.jobId ? job.jobId : job.url;
-    if (!jobKey) return false;
-    // Check if the jobKey exists in the seen_jobs object in localStorage
-    const seenJobsStr = localStorage.getItem("seen_jobs");
-    let seenJobs: { [key: string]: string } = {};
-    const threshold = 15; // in minutes, as per prompt
-    if (!seenJobsStr) {
-      // If seen_jobs does not exist, treat jobs as new if they are 15 minutes old or less
-      const detectedTime = new Date(job.detected);
-      const now = new Date();
-      const diffMs = now.getTime() - detectedTime.getTime();
-      const diffMinutes = diffMs / 60000;
-      return diffMinutes <= threshold;
-    } else {
-      try {
-        seenJobs = JSON.parse(seenJobsStr);
-      } catch (e) {
-        seenJobs = {};
-      }
-    }
-    if (!(jobKey in seenJobs)) {
-      return true;
-    }
-    // If the job was seen, check if it was seen less than 15 minutes ago
-    const seenTime = new Date(seenJobs[jobKey]);
-    const now = new Date();
-    const diffMs = now.getTime() - seenTime.getTime();
-    const diffMinutes = diffMs / 60000;
-    if (checkTimeDiff) {
-      return diffMinutes < threshold;
-    }
-    return false;
-  }
-  // Mark all jobs that aren't seen as seen when component mounts or jobListings change
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      jobListings.forEach((job) => {
-        if (isJobNew(job, false)) {
-          markJobAsSeen(job);
-        }
-      });
-    }, 500);
-    return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line
-  }, [jobListings]);
 
   function markJobAsSeen(job: Job) {
-    if (!job) return;
+    console.log("marking ", job.title);
     const jobKey = job.jobId ? job.jobId : job.url;
-    if (!jobKey) return;
     const seenJobsStr = localStorage.getItem("seen_jobs");
     let seenJobs: { [key: string]: string } = {};
     if (seenJobsStr) {
@@ -119,11 +108,109 @@ function CompanyJobs({
       }
     }
     seenJobs[jobKey] = new Date().toISOString();
+    console.log("marked ", job.title);
     localStorage.setItem("seen_jobs", JSON.stringify(seenJobs));
+    // Add the job id (or url) to clickedJobIds state if not already present
+  }
+
+  function isJobNew(job: Job): "Brand new" | "New" | "Old" {
+    const jobKey = job.jobId ? job.jobId : job.url;
+
+    if (firstVisit) {
+      const detectedTime = new Date(job.detected);
+      const now = new Date();
+      const diffMs = now.getTime() - detectedTime.getTime();
+      const diffMinutes = diffMs / 60000;
+      return diffMinutes <= threshold ? "New" : "Old";
+    }
+
+    const seenJobsStr = localStorage.getItem("seen_jobs");
+    let seenJobs: { [key: string]: string } = {};
+
+    if (!seenJobsStr) {
+      return "Old";
+    } else {
+      try {
+        seenJobs = JSON.parse(seenJobsStr);
+      } catch (e) {
+        seenJobs = {};
+      }
+    }
+    if (!(jobKey in seenJobs)) {
+      return "Brand new";
+    }
+    // If the job was seen, check if it was seen less than 15 minutes ago
+    const seenTime = new Date(seenJobs[jobKey]);
+    const now = new Date();
+    const diffMs = now.getTime() - seenTime.getTime();
+    const diffMinutes = diffMs / 60000;
+    //console.log(seenTime, now, job.title, diffMinutes);
+    return diffMinutes <= threshold ? "New" : "Old";
+  }
+
+  // Mark all jobs that aren't seen as seen when component mounts or jobListings change
+  function jobStatusBadge(job: Job) {
+    switch (isJobNew(job)) {
+      case "Brand new":
+        return <Badge className="bg-red-600 text-gray-800 h-[40px]">New</Badge>;
+      case "New":
+        return (
+          <Badge className="bg-amber-200 text-gray-800 h-[40px]">New</Badge>
+        );
+      case "Old":
+        return <></>;
+      default:
+        return <></>;
+    }
+  }
+
+  // Mark all "Brand new" jobs as seen
+  /*filteredJobs.forEach((job) => {
+    if (isJobNew(job) === "Brand new") {
+      markJobAsSeen(job);
+    }
+  });*/
+
+  function markJobAsClicked(job: Job) {
+    if (!job.jobId) return;
+    const clickedJobsStr = localStorage.getItem("hasClicked");
+    let clickedJobs: { [key: string]: boolean } = {};
+    if (clickedJobsStr) {
+      try {
+        clickedJobs = JSON.parse(clickedJobsStr);
+      } catch (e) {
+        clickedJobs = {};
+      }
+    }
+    clickedJobs[job.jobId] = true;
+    localStorage.setItem("hasClicked", JSON.stringify(clickedJobs));
+    // Also add the job to the state hasClicked
+    setClickedJobIds((prev) => {
+      const jobKey = job.jobId ? job.jobId : job.url;
+      if (!prev.includes(jobKey)) {
+        return [...prev, jobKey];
+      }
+      return prev;
+    });
+  }
+
+  function isJobClicked(job: Job): boolean {
+    const jobKey = job.jobId ? job.jobId : job.url;
+    const clickedJobsStr = localStorage.getItem("hasClicked");
+    if (!clickedJobsStr) {
+      return false;
+    }
+    try {
+      const clickedJobs: { [key: string]: boolean } =
+        JSON.parse(clickedJobsStr);
+      return clickedJobs[jobKey] === true;
+    } catch (e) {
+      return false;
+    }
   }
 
   return (
-    <div className="md:flex bg-gray-100 rounded-2xl py-3 px-4 mb-4">
+    <div className="md:flex bg-gray-100 rounded-2xl p-3 mb-3 ">
       <div className="min-w-[150px] mb-6">
         <h2 className="text-2xl ">{companyName}</h2>
         <p className="text-sm text-gray-500 ">
@@ -133,21 +220,29 @@ function CompanyJobs({
       <ul className="w-full">
         {filteredJobs.map((job) => (
           <li key={job.jobId}>
-            <div className="flex justify-between my-2 hover:bg-gray-200  rounded-lg">
-              <div className="flex flex-col">
-                <a href={job.url} target="_blank" rel="noopener noreferrer">
-                  {job.title}
-                </a>
-                <p className="text-sm text-gray-500">
-                  {timeDiffFromNow(job.detected)}
-                </p>
+            <a
+              href={job.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+              onClick={() => markJobAsClicked(job)}
+            >
+              <div
+                className={`flex p-2 justify-between my-2 rounded-lg ${
+                  isJobClicked(job)
+                    ? "bg-blue-100 hover:bg-blue-200"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">{job.title}</span>
+                  <p className="text-sm text-gray-500">
+                    {timeDiffFromNow(job.detected)}
+                  </p>
+                </div>
+                {jobStatusBadge(job)}
               </div>
-              {isJobNew(job, true) && (
-                <Badge className="bg-amber-200 text-gray-800 h-[40px]">
-                  New
-                </Badge>
-              )}
-            </div>
+            </a>
           </li>
         ))}
       </ul>
