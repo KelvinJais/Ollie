@@ -96,7 +96,6 @@ function CompanyJobs({
   }
 
   function markJobAsSeen(job: Job) {
-    console.log("marking ", job.title);
     const jobKey = job.jobId ? job.jobId : job.url;
     const seenJobsStr = localStorage.getItem("seen_jobs");
     let seenJobs: { [key: string]: string } = {};
@@ -108,7 +107,6 @@ function CompanyJobs({
       }
     }
     seenJobs[jobKey] = new Date().toISOString();
-    console.log("marked ", job.title);
     localStorage.setItem("seen_jobs", JSON.stringify(seenJobs));
     // Add the job id (or url) to clickedJobIds state if not already present
   }
@@ -138,6 +136,7 @@ function CompanyJobs({
     }
     if (!(jobKey in seenJobs)) {
       markJobAsSeen(job);
+      console.log(job.title, " marked as brand new");
       return "Brand new";
     }
     // If the job was seen, check if it was seen less than 15 minutes ago
@@ -145,7 +144,14 @@ function CompanyJobs({
     const now = new Date();
     const diffMs = now.getTime() - seenTime.getTime();
     const diffMinutes = diffMs / 60000;
-    //console.log(seenTime, now, job.title, diffMinutes);
+    // If the time diff is exactly 1 minute, return "brand new"
+    if (diffMinutes < 1) {
+      console.log(job.title, " marked as brand new (1 minute diff)");
+      return "Brand new";
+    }
+    diffMinutes <= threshold
+      ? console.log(job.title, " marked as new")
+      : console.log(job.title, " marked as old");
     return diffMinutes <= threshold ? "New" : "Old";
   }
 
