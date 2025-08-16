@@ -2,6 +2,7 @@ import Header from "./Components/Header";
 import Filter from "./Components/Filter";
 import CompanyJobs from "./Components/CompanyJobs";
 import { useEffect, useState } from "react";
+import SkeletonLoader from "./Components/SkeletonLoader";
 
 type Job = {
   jobId?: string; // some jobs have jobId, some only url as ID
@@ -67,7 +68,7 @@ function App() {
     localStorage.setItem("seen_jobs", JSON.stringify({}));
   }
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <SkeletonLoader />;
   if (error) return <div>Error: {error.message}</div>;
   if (!data || !data.jobs) return <div>No data available</div>;
   return (
