@@ -6,7 +6,7 @@ type FilterProps = {
 };
 
 function Filter({ showOnlyNew, toggle }: FilterProps) {
-  const clearLocalStorage = () => {
+  /*const clearLocalStorage = () => {
     localStorage.clear();
   };
 
@@ -18,7 +18,7 @@ function Filter({ showOnlyNew, toggle }: FilterProps) {
     >
       Clear Local Storage
     </Button>
-  );
+  );*/
 
   return (
     <div className="flex  gap-4 bg-gray-100 rounded-2xl py-3 px-4 mb-4">
