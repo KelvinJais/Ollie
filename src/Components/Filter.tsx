@@ -10,6 +10,16 @@ function Filter({ showOnlyNew, toggle }: FilterProps) {
     localStorage.clear();
   };
 
+  const clearLocalStorageButton = (
+    <Button
+      onClick={clearLocalStorage}
+      className="bg-red-500 hover:bg-red-600"
+      variant="destructive"
+    >
+      Clear Local Storage
+    </Button>
+  );
+
   return (
     <div className="flex  gap-4 bg-gray-100 rounded-2xl py-3 px-4 mb-4">
       <Button
@@ -21,13 +31,6 @@ function Filter({ showOnlyNew, toggle }: FilterProps) {
         }`}
       >
         New
-      </Button>
-      <Button
-        onClick={clearLocalStorage}
-        className="bg-red-500 hover:bg-red-600"
-        variant="destructive"
-      >
-        Clear Local Storage
       </Button>
     </div>
   );
