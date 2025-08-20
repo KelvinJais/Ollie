@@ -22,7 +22,20 @@ function App() {
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [showOnlyNew, setshowOnlyNew] = useState(true);
+  // stored === "true" checks if the value in localStorage is the string "true" (since localStorage stores everything as strings).
+  // If it is, we set showOnlyNew to true, otherwise false.
+  const [showOnlyNew, setshowOnlyNew] = useState(() => {
+    const stored = localStorage.getItem("showOnlyNew");
+    if (stored === null) {
+      return false;
+    }
+    return stored === "true";
+  });
+
+  // Save showOnlyNew to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("showOnlyNew", showOnlyNew.toString());
+  }, [showOnlyNew]);
 
   useEffect(() => {
     fetch(

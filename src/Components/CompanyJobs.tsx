@@ -227,7 +227,7 @@ function CompanyJobs({
               <div
                 className={`flex p-2 justify-between my-2 rounded-lg ${
                   isJobClicked(job)
-                    ? "bg-blue-100 hover:bg-blue-200"
+                    ? "bg-gray-200 hover:bg-gray-200"
                     : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
